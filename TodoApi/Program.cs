@@ -32,6 +32,7 @@ app.MapGet("/api/todo0s/{id}", (int id) =>
     return todo is not null ? Results.NotFound() : Results.Ok(todo);
 });
 
+
 app.MapPost("/api/todos", (TodoPostDto dto) =>
 {
     var nextId = todos.Count == 0 ? 1 : todos.Max(t => t.Id) + 1;
@@ -42,5 +43,25 @@ app.MapPost("/api/todos", (TodoPostDto dto) =>
     return Results.Created($"/api/todos/{todo.Id}", todo);
 });
 
+app.MapPut("/api/todos/{id}", (int id, TodoPutDto dto) =>
+{
+    try
+    {
+        var index = todos.FindIndex(x => x.Id == id);
+        //if (index == -1) return Results.NotFound();
+
+        todos[index] = todos[index] with
+        {
+            Title = dto.Title,
+            IsCompleted = dto.IsCompleted
+        };
+
+        return Results.Ok(todos[index]);
+    }
+    catch (Exception ex)
+    {
+         return Results.Problem(ex.Message);
+    }
+});
 
 app.Run();
